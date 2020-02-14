@@ -1,0 +1,97 @@
+OPEN SRC/MAP/SKILL.CPP
+/// ===================================================================================
+Find: 
+		if( src != bl && status_isdead(bl) ) {
+		switch( skill_id ) { // Skills that may be cast on dead targets
+		case NPC_WIDESOULDRAIN:
+		case PR_REDEMPTIO:
+		case ALL_RESURRECTION:
+		case WM_DEADHILLHERE:
+		case WE_ONEFOREVER:
+		break;
+		default:
+		return 1;
+		}
+		}
+
+Remove: case PR_REDEMPTIO:
+		if( src != bl && status_isdead(bl) ) {
+		switch( skill_id ) { // Skills that may be cast on dead targets
+		case NPC_WIDESOULDRAIN:
+		Remove //case PR_REDEMPTIO:
+		case ALL_RESURRECTION:
+		case WM_DEADHILLHERE:
+		case WE_ONEFOREVER:
+		break;
+		default:
+		return 1;
+		}
+		}
+
+/// ===================================================================================
+		/* case PR_REDEMPTIO:
+		if (sd && !(flag&1)) {
+		if (sd->status.party_id == 0) {
+		clif_skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
+		break;
+		}
+		skill_area_temp[0] = 0;
+		party_foreachsamemap(skill_area_sub,
+		sd,skill_get_splash(skill_id, skill_lv),
+		src,skill_id,skill_lv,tick, flag|BCT_PARTY|1,
+		skill_castend_nodamage_id);
+		if (skill_area_temp[0] == 0) {
+		clif_skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
+		break;
+		}
+		skill_area_temp[0] = battle_config.exp_cost_redemptio_limit - skill_area_temp[0]; // The actual penalty...
+		if (skill_area_temp[0] > 0 && !map_getmapflag(src->m, MF_NOEXPPENALTY) && battle_config.exp_cost_redemptio) { //Apply penalty
+		//If total penalty is 1% => reduced 0.2% penalty per each revived player
+		pc_lostexp(sd, u32min(sd->status.base_exp, (pc_nextbaseexp(sd) * skill_area_temp[0] * battle_config.exp_cost_redemptio / battle_config.exp_cost_redemptio_limit) / 100), 0);
+		}
+		status_set_hp(src, 1, 0);
+		status_set_sp(src, 0, 0);
+		break;
+		} else if (status_isdead(bl) && flag&1) { //Revive
+		skill_area_temp[0]++; //Count it in, then fall-through to the Resurrection code.
+		skill_lv = 3; //Resurrection level 3 is used
+		} else //Invalid target, skip resurrection.
+		break; */
+
+/// ===================================================================================
+Find and Add: 
+		case MO_STEELBODY:
+		case MO_BLADESTOP:
+		case LK_AURABLADE:
+		case LK_PARRYING:
+		case MS_PARRYING:
+		case LK_CONCENTRATION:
+		case PR_REDEMPTIO: //ADD THIS
+
+/// ===================================================================================
+Find and Remove:
+		//case PR_REDEMPTIO:
+		case LG_INSPIRATION:
+
+/// ===================================================================================
+CLOSE SKILL.CPP
+
+OPEN SRC/MAP/STATUS.CPP
+/// ===================================================================================
+Find: 
+    #ifndef RENEWAL
+		    SCB_BATK|SCB_WATK|SCB_HIT|SCB_DEF|SCB_DEF2 )
+        
+Add before the last line:
+    set_sc( PR_REDEMPTIO , SC_REFLECTDAMAGE , EFST_LG_REFLECTDAMAGE , SCB_NONE ); //add PR_REDEMPTIO
+    
+    CHANGE TO REFLECT DAMAGE to 40% and 100% chance
+    case SC_REFLECTDAMAGE:
+    val2 = 15 + 5 + 10; // Reflect amount
+    val3 = 50 + 50; // Number of reflects
+    val4 = tick/1000; // Number of SP cycles (duration)
+    t_tickime = 1000; // [GodLesZ] tick time
+    break;
+    
+/// CLOSE AND COMPILE ====
+/// ===================================================================================
